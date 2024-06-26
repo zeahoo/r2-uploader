@@ -39,8 +39,12 @@ export default async function Command() {
         }),
       );
       if (outputFormat === "JSON") {
-        const OSS_URL_LIST_STRING = JSON.stringify(OSS_URL_LIST, null, 2);
-        await Clipboard.copy(OSS_URL_LIST_STRING);
+        if (OSS_URL_LIST.length === 1) {
+          await Clipboard.copy(JSON.stringify(OSS_URL_LIST[0], null, 2));
+        } else {
+          const OSS_URL_LIST_STRING = JSON.stringify(OSS_URL_LIST, null, 2);
+          await Clipboard.copy(OSS_URL_LIST_STRING);
+        }
       } else if (outputFormat === "Markdown") {
         const MD = OSS_URL_LIST.map((item) => {
           const filename = item.filename;
