@@ -11,16 +11,47 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
-      "title": "Set uploader config",
-      "description": "R2 Config Setting form, config your api info",
-      "mode": "view"
-    },
-    {
       "name": "upload",
       "title": "upload file",
       "description": "upload file from your last clipboard",
       "mode": "no-view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "accountId",
+      "title": "Account ID",
+      "description": "Your Cloudflare R2 account ID",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "accessKeyId",
+      "title": "Access Key ID",
+      "description": "Access key Id can be found in your Cloudflare R2 token configuration",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "secretAccessKey",
+      "title": "Secret Access Key",
+      "description": "Secret Access Key can be found in your Cloudflare R2 token configuration",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "bucketName",
+      "title": "Bucket",
+      "description": "The bucket name you want to upload to",
+      "type": "textfield",
+      "required": true
+    },
+    {
+      "name": "publicDomain",
+      "title": "Custom domain",
+      "description": "Custom domain for your bucket, leave it empty if you don't have one",
+      "required": false,
+      "type": "textfield"
     }
   ],
   "dependencies": {
