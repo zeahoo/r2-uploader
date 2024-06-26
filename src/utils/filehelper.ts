@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-function getAllFilePaths(
+export function getAllFilePaths(
   filePath: string,
 ): { filePath: string; filename: string; fullname: string; extension: string }[] {
   const filePaths: { filePath: string; filename: string; fullname: string; extension: string }[] = [];
@@ -30,4 +30,7 @@ function getAllFilePaths(
   return filePaths;
 }
 
-export default getAllFilePaths;
+export function isImageFormat(extension: string): boolean {
+  const imageFormats = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+  return imageFormats.includes(extension.toLowerCase());
+}
