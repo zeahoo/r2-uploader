@@ -4,4 +4,5 @@ export type R2Config = {
   secretAccessKey: string;
   bucketName: string;
   publicDomain: string;
+  outputFormat: string;
 };

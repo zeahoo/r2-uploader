@@ -1,20 +1,18 @@
-import { Form, showHUD, Toast, LocalStorage, Clipboard, showToast, getPreferenceValues } from "@raycast/api";
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { showHUD, Toast, Clipboard, showToast, getPreferenceValues } from "@raycast/api";
+import { S3Client } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { readFileSync } from "fs";
 import mime from "mime-types";
 import path from "path";
-import { R2Config } from "./types/Config";
+import { R2Config } from "./types/config";
+import { uploadToOSS } from "./utils/s3helper";
 export default async function Command() {
   try {
     const config: R2Config = getPreferenceValues<R2Config>();
     // Modify the config here
     const ACCOUNT_ID = config.accountId || "";
-    const bucket_name = config.bucketName;
     const ACCESS_KEY_ID = config.accessKeyId || "";
     const SECRET_ACCESS_KEY = config.secretAccessKey || "";
-    const PUBLIC_DOMAIN = config.publicDomain || "";
     const ENDPOINT = `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`;
 
     const S3 = new S3Client({
@@ -33,35 +31,12 @@ export default async function Command() {
       const normalizedPath = file.replace(/^file:\/\//, "");
       const extension = path.extname(normalizedPath);
       const contentType = mime.contentType(extension) || "application/octet-stream";
-      const fileContent = readFileSync(normalizedPath);
+      const fileContent: Buffer = readFileSync(normalizedPath);
       const key = uuidv4() + extension;
       console.log(key);
-      await S3.send(
-        new PutObjectCommand({
-          Bucket: bucket_name,
-          Key: key,
-          ContentType: contentType,
-          Body: fileContent,
-        }),
-      );
-      if (PUBLIC_DOMAIN && PUBLIC_DOMAIN.length > 0) {
-        const URL = `${PUBLIC_DOMAIN}/${key}`;
-        await Clipboard.copy(URL);
-        showHUD("Copied to clipboard");
-      } else {
-        // const response = await getSignedUrl(S3, putCommand, { expiresIn: 3600 });
-        const response = await getSignedUrl(
-          S3,
-          new GetObjectCommand({
-            Bucket: bucket_name,
-            Key: key,
-          }),
-          { expiresIn: 3600 },
-        );
-        console.log(response);
-        await Clipboard.copy(response);
-        showHUD("Copied to clipboard");
-      }
+      const URL = await uploadToOSS(S3, config, key, fileContent, contentType);
+      await Clipboard.copy(URL);
+      showHUD("Copied to clipboard");
     } else {
       showToast({
         style: Toast.Style.Failure,

@@ -12,7 +12,7 @@
   "commands": [
     {
       "name": "upload",
-      "title": "upload file",
+      "title": "Upload from your clipboard",
       "description": "upload file from your last clipboard",
       "mode": "no-view"
     }
@@ -52,6 +52,27 @@
       "description": "Custom domain for your bucket, leave it empty if you don't have one",
       "required": false,
       "type": "textfield"
+    },
+    {
+      "name": "outputFormat",
+      "title": "Output format",
+      "description": "Choose a output format from your link",
+      "required": true,
+      "type": "dropdown",
+      "data": [
+        {
+          "title": "URL",
+          "value": "URL"
+        },
+        {
+          "title": "Markdown",
+          "value": "Markdown"
+        },
+        {
+          "title": "JSON",
+          "value": "JSON"
+        }
+      ]
     }
   ],
   "dependencies": {
