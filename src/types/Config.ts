@@ -5,4 +5,5 @@ export type R2Config = {
   bucketName: string;
   publicDomain: string;
   outputFormat: string;
+  dir: string;
 };

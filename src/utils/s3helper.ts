@@ -38,7 +38,11 @@ export async function uploadToOSS(
     }),
   );
   if (publicDomain && publicDomain.length > 0) {
-    return `${publicDomain}/${key}`;
+    if (publicDomain.endsWith("/")) {
+      return `${publicDomain}${key}`;
+    } else {
+      return `${publicDomain}/${key}`;
+    }
   } else {
     const response = await getSignedUrl(
       S3,

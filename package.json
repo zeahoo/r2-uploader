@@ -73,6 +73,13 @@
           "value": "JSON"
         }
       ]
+    },
+    {
+      "name": "dir",
+      "title": "Directory",
+      "description": "The directory you want to upload to",
+      "type": "textfield",
+      "required": false
     }
   ],
   "dependencies": {

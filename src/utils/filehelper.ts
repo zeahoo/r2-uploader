@@ -34,3 +34,18 @@ export function isImageFormat(extension: string): boolean {
   const imageFormats = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
   return imageFormats.includes(extension.toLowerCase());
 }
+
+export function getDirectory(dir: string): string {
+  if (dir) {
+    let directory = dir;
+    if (dir.startsWith("/")) {
+      directory = directory.substring(1);
+    }
+    if (!dir.endsWith("/")) {
+      directory = directory + "/";
+    }
+    return directory;
+  } else {
+    return "";
+  }
+}

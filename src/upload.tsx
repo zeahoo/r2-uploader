@@ -6,7 +6,8 @@ import mime from "mime-types";
 import path from "path";
 import { R2Config } from "./types/config";
 import { getS3Client, uploadToOSS } from "./utils/s3helper";
-import { getAllFilePaths, isImageFormat } from "./utils/filehelper";
+import { getAllFilePaths, isImageFormat, getDirectory } from "./utils/filehelper";
+import { dir } from "console";
 export default async function Command() {
   try {
     const { file } = await Clipboard.read();
@@ -14,6 +15,8 @@ export default async function Command() {
     const config: R2Config = getPreferenceValues<R2Config>();
     const S3 = getS3Client(config);
     const outputFormat = config.outputFormat || "";
+    const directory = getDirectory(config.dir);
+    console.log(directory);
 
     // read file
     if (file) {
@@ -23,7 +26,7 @@ export default async function Command() {
         pathList.map(async ({ filePath, filename, fullname, extension }) => {
           const contentType = mime.contentType(extension) || "application/octet-stream";
           const fileContent: Buffer = readFileSync(filePath);
-          const key = uuidv4() + extension;
+          const key = directory + uuidv4() + extension;
           console.log(
             `currentFile Path: ${filePath} Filename: ${filename} Fullname: ${fullname} Extension: ${extension}
              key: ${key}
