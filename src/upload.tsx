@@ -5,37 +5,35 @@ import { readFileSync } from "fs";
 import mime from "mime-types";
 import path from "path";
 import { R2Config } from "./types/config";
-import { uploadToOSS } from "./utils/s3helper";
+import { getS3Client, uploadToOSS } from "./utils/s3helper";
+import getAllFilePaths from "./utils/filehelper";
 export default async function Command() {
   try {
-    const config: R2Config = getPreferenceValues<R2Config>();
-    // Modify the config here
-    const ACCOUNT_ID = config.accountId || "";
-    const ACCESS_KEY_ID = config.accessKeyId || "";
-    const SECRET_ACCESS_KEY = config.secretAccessKey || "";
-    const ENDPOINT = `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`;
-
-    const S3 = new S3Client({
-      region: "auto",
-      endpoint: ENDPOINT,
-      credentials: {
-        accessKeyId: ACCESS_KEY_ID,
-        secretAccessKey: SECRET_ACCESS_KEY,
-      },
-    });
-    const { text, file, html } = await Clipboard.read();
+    const { file } = await Clipboard.read();
     console.log(`File: ${file}`);
+    const config: R2Config = getPreferenceValues<R2Config>();
+    const S3 = getS3Client(config);
+    const outputFormat = config.outputFormat;
 
     // read file
     if (file) {
       const normalizedPath = file.replace(/^file:\/\//, "");
-      const extension = path.extname(normalizedPath);
-      const contentType = mime.contentType(extension) || "application/octet-stream";
-      const fileContent: Buffer = readFileSync(normalizedPath);
-      const key = uuidv4() + extension;
-      console.log(key);
-      const URL = await uploadToOSS(S3, config, key, fileContent, contentType);
-      await Clipboard.copy(URL);
+      const pathList = getAllFilePaths(normalizedPath);
+      console.log(`PathList: ${pathList}`);
+      const OSS_URL_LIST = pathList.map(async (filePath) => {
+        const extension = path.extname(filePath);
+        const contentType = mime.contentType(extension) || "application/octet-stream";
+        const fileContent: Buffer = readFileSync(filePath);
+        const key = uuidv4() + extension;
+        console.log(key);
+        const URL = await uploadToOSS(S3, config, key, fileContent, contentType);
+        return {
+          key: key,
+          url: URL,
+        };
+      });
+      const OSS_URL_LIST_STRING = JSON.stringify(await Promise.all(OSS_URL_LIST), null, 2);
+      await Clipboard.copy(OSS_URL_LIST_STRING);
       showHUD("Copied to clipboard");
     } else {
       showToast({
