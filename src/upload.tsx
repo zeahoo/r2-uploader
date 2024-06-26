@@ -19,16 +19,23 @@ export default async function Command() {
     if (file) {
       const normalizedPath = file.replace(/^file:\/\//, "");
       const pathList = getAllFilePaths(normalizedPath);
-      console.log(`PathList: ${pathList}`);
-      const OSS_URL_LIST = pathList.map(async (filePath) => {
-        const extension = path.extname(filePath);
+      pathList.forEach(({ filePath, filename, fullname, extension }) => {
+        console.log("-----------------------");
+        console.log(`filePath: ${filePath}`);
+        console.log(`filename: ${filename}`);
+        console.log(`fullname: ${fullname}`);
+        console.log(`extension: ${extension}`);
+      });
+      const OSS_URL_LIST = pathList.map(async ({ filePath, filename, fullname, extension }) => {
         const contentType = mime.contentType(extension) || "application/octet-stream";
         const fileContent: Buffer = readFileSync(filePath);
         const key = uuidv4() + extension;
         console.log(key);
         const URL = await uploadToOSS(S3, config, key, fileContent, contentType);
         return {
-          key: key,
+          filename: filename,
+          fullname: fullname,
+          extension: extension,
           url: URL,
         };
       });
